@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<title>Fiducials test</title>
+	   <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0">
+	<style>
+	html, body {height: 100%; width: 100%; margin: 0; padding:0;}
+	#change {height: 100%; width: auto}
+	#gdiv {height: 90%; width: 90%; text-align:center}
+	#containerDiv {height: 100%; width:100%}
+    </style>
+
+	<script type="text/javascript">
+	var i = 0;
+	function changeSrc(elem, name){
+	var filename = 'images/fid' + i +'.gif';
+	//alert(filename);
+	 document.getElementById(elem).src = filename;
+	
+		if (i < 5){
+			i++;
+		}else{
+			i = 0;
+		}
+	
+	}
+	
+	setInterval("changeSrc('change')", 2000);
+	 
+	function updateOrientation () {
+		if ( window.orientation == 0 ) {  
+		    // alert ('0');  
+		document.getElementById('change').style.height = '100%';
+	//	document.getElementById('change').style.width = '100%';
+		    }  
+		    else if ( window.orientation == 90 ) {  
+			//alert ('90');
+			document.getElementById('change').style.height = '60%';
+		//	document.getElementById('change').style.width = '50%';
+		    }  
+		    else if ( window.orientation == -90 ) {  
+			//alert ('-90');
+			document.getElementById('change').style.height = '60%';
+		//	document.getElementById('change').style.width = '50%';
+		    }  
+		    else if ( window.orientation == 180 ) {  
+			//alert ('180');
+			document.getElementById('change').style.height = '100%';
+			//document.getElementById('change').style.width = '100%';
+		    }	
+	}
+		
+	window.onorientationchange = updateOrientation; 
+	
+	window.onload = function initialLoad(){  
+        updateOrientation();  
+    }
+	</script>
+	
+  </head>
+
+  <body>
+	<div id="containerDiv">
+		<div id= "gdiv"><img id= "change" src= "images/fid0.gif"></div>
+	</div>
+  </body>
+
+</html>
