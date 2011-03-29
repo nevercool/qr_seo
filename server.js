@@ -25,13 +25,14 @@ server = http.createServer(function(req, res)
 	var path = this.prefix+url.parse(req.url).pathname;
 	fs.readFile(__dirname + path, function(err, data)
 	{
+		console.log('serving ' + path);
+		
 		if (err) return send404(res);
-
+		
 		var type = 'text/html';
 
 		if(path.indexOf('js') > -1) type = 'text/javascript';
 		else if(path.indexOf('css') > -1) type = 'text/css';
-		
 		
 		res.writeHead(200, {'Content-Type':type});
 		res.write(data, 'utf8');
@@ -47,7 +48,7 @@ send404 = function(res){
 
 
 server.listen(socketPort);
-server.prefix = '/web/';
+server.prefix = '/web';
 
 // socket.io, I choose you
 var io = io.listen(server)
