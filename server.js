@@ -64,7 +64,7 @@ var OSCclient = new osc.Client(11720, '127.0.0.1');
 	//console.log("message from client");
 	var msg = { message: [client.sessionId, message] };
 	buffer.push(msg);
-	if (buffer.length > 15) buffer.shift();
+	if (buffer.length > 30) buffer.shift();
     client.broadcast(msg);
 	
 	

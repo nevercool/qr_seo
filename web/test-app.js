@@ -1,10 +1,54 @@
-//set all buttons to off to start
-var buttons = new Array(0,0,0,0);
+// UI code
+
+var buttonTotal = 16;
+
+$(document).ready(function() {
+   for(var i = 0; i < buttonTotal; i++) {
+    $('#buttonDiv').append('<div class= "button" 	id="b_' + i + '"><div class = "label">' + i + '</div></div>' )
+
+ 	/* version using Touchable plugin
+	// this would potentially be cross-device tap, but is slightly slower
+	var tDiv = $('#b_'+i).Touchable();
+	tDiv.bind('tap', function(event, ui) {
+	*/
+	
+		// version w/out Touchable plugin
+		// if the touch event is supported, bind to it
+		// otherwise bind to mousedown event
+		if ('ontouchstart' in document.documentElement) {
+			$('#b_'+i).bind('touchstart', function(event, ui) {
+			buttonClick(this);
+			});
+		}else{
+			$('#b_'+i).bind('mousedown', function(event, ui) {
+			buttonClick(this);
+			});
+		} 
+}
+});
+
+touchMove = function(event) {
+// Prevent scrolling 
+event.preventDefault();
+}
+touchStart = function(event) {
+// Prevent scrolling 
+event.preventDefault();
+}
+
+// end UI code 
+// Start Client code
+
+//create an array for buttons
+var buttons = new Array();
 var socketPort = 9000;
+var maxBufferDisplay = 15;
 
 // button toggle
 function buttonClick(elem){
-	num = elem.id.charAt(1);
+	//num = elem.id.charAt(1);
+ 	num = elem.id.split('_')[1];
+	console.log("button number: "+num);
 	if (buttons[num] == 0){
 		//alert(num +" button off, turn on")
 		buttonUpdate(num, 127, elem);
@@ -19,7 +63,7 @@ function buttonClick(elem){
 
 function buttonUpdate(num, val, elem){
 	buttons[num] = val;
-	if (!elem) elem = document.getElementById("b"+num);
+	if (!elem) elem = document.getElementById("b_"+num);
 	if (val == 127) {	
 		elem.style.backgroundColor = "#ffffff";	
 	}else{
@@ -30,11 +74,6 @@ function buttonUpdate(num, val, elem){
 function isInt(value) { 
 	return !isNaN(parseInt(value)) && (parseFloat(value) == parseInt(value)); 
 }
-
-// this is a version without jquery for debugging. jquery would be better overall 
-// to access and toggle elements, handling the socket sending/listening
-// it does add some load time and a tad more complexity however...
-
 
 //
 // socket.io
@@ -47,6 +86,7 @@ function message(obj){
 	
 	// change the buttons on the client end when updates come from server
 	// right now this just tests for messages that have integer as 2nd element
+	// might need a better system of validating messages?
 	
 	if ('message' in obj && isInt(obj.message[1])){
 	var msg = obj.message[1].split(' ');
@@ -57,7 +97,7 @@ function message(obj){
 
 
 	// in this version we only store the max buffer amount and remove the old ones
-	if (document.getElementById('status').childNodes.length > 15){
+	if (document.getElementById('status').childNodes.length > maxBufferDisplay){
 		document.getElementById('status').removeChild(document.getElementById('status').childNodes[0])
 	}
 		// add the messages to the list
@@ -91,7 +131,7 @@ socket.on('message', function(obj){
 	//document.getElementById('status').innerHTML = '';
 	//for (var i in obj.buffer) message(obj.buffer[i]);
 	
-		// only update buttons in buffer, not messages
+		// only update the buttons in buffer, not messages
 		for (var i in obj.buffer){
 			var msg = obj.buffer[i].message[1].split(' ');
 			buttonUpdate(msg[0], msg[1]);

@@ -1,34 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0">
+	<meta name="viewport"content="user-scalable=no, width=device-width" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	
 	<title>Socket server test</title>
     <link type="text/css" rel="stylesheet" href="test-app.css">
     <!-- socket.io -->
 	
     <script src="/json.js"></script> 
     <script src="/socket.io/socket.io.js"></script> <!--this is confusing as it's not really a valid path but as of now it works -->
-		
-    <!-- test-app.js -->
-    <script type="text/javascript" src="test-app.js"></script>
 
+	<!-- jQuery -->
+	<script src="http://code.jquery.com/jquery-1.5.min.js"></script>
+	<!--<script src="/touchable.js"></script>-->
+	
+    <!-- UI and client communication -->
+    <script type="text/javascript" src="test-app.js"></script>
   </head>
 
-  <body>
+	<!-- handle touch events on body element with a scroll preventer -->
+  <body id="bodycontainer" ontouchmove="touchMove(event);" ontouchstart="touchStart(event);">
 	<div id="buttonDiv">
-    <div class="button" id="b0" onClick="buttonClick(this);"><div class="label">0</div></div>
-	<div class="button" id="b1"onClick="buttonClick(this);"><div class="label">1</div></div> 
-	<div class="button" id="b2"onClick="buttonClick(this);"><div class="label">2</div></div> 
-	<div class="button" id="b3"onClick="buttonClick(this);"><div class="label">3</div></div>
+		<!--jquery loop (in linked .js file above) adds the buttons divs here -->
 	</div>
-	 <!--<form id="form" onSubmit="send(); return false">
-      <input type="text" autocomplete="off" id="text"><input type="submit" value="Send">
-    </form>-->
-	<div id="status"><p>Connecting...</p></div>
-
-	
-
-
-    
+	<div id="status"><p>Connecting...</p></div>  
   </body>
-
 </html>

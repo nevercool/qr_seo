@@ -3,32 +3,16 @@ html, body {
     padding: 0; 
     height: 100%;
     position: relative;
-    overflow: auto;
-
-    background-image: -webkit-gradient(
-        linear,
-        left bottom,
-        left top,
-        color-stop(0.02, rgb(44,119,80)),
-        color-stop(0.51, rgb(71,155,112)),
-        color-stop(0.76, rgb(100,186,146))
-    );
-    background-image: -moz-linear-gradient(
-        center bottom,
-        rgb(44,119,80) 2%,
-        rgb(71,155,112) 51%,
-        rgb(100,186,146) 76%
-    );
-    
+    overflow: auto;  
+  	background-color: #FE24E7;
 }
 
-#buttonDiv {width: 100%; height: 70%; background-color: #ccc; padding: 5px;}
-.button {height: 48%; width: 48%; background-color: #000; display: block; float: left; margin: 2px}
-.label {text-align:center; font: Helvetica, Arial; font-size: 5em; font-weight: bold; color: #FE24E7}
-#status { height: 30%; overflow: auto; width: 100%; border: 1px solid #eee; color: #000; font: 13px Helvetica, Arial; clear: both; opacity: 0.6;}
+#buttonDiv {width: 100%; height: 70%; background-color: #ccc}
+.button {height: 25%; width: 25%; background-color: #000; display: block; float: left}
+.label {text-align:center; font: Helvetica, Arial; font-size: 1em; font-weight: bold; color: #FE24E7}
+#status { height: 35%; overflow: auto; width: 100%; border: 1px solid #eee; color: #000; font: .3em Helvetica, Arial; clear: both; opacity: 0.6;}
 #status p { padding: 8px; margin: 0;}
 #status p:nth-child(odd) { background: #ffffff; }
--webkit-border-radius: 8px; margin-left: 5px; text-shadow: 0 1px 0 #fff;
 
 
 
