@@ -120,7 +120,6 @@ document.getElementById('text').value = '';
 
 */
 
-var socketPort = 9000;
 var maxBufferDisplay = 15;
 var socket = new io.Socket(null, {port: socketPort, rememberTransport: false});
 
