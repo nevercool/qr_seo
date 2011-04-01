@@ -54,28 +54,44 @@ server.prefix = '/web';
 var io = io.listen(server)
   , buffer = [];
   
+function setOscConfig(ip, port){
+	
+	return new osc.Client(port, ip);
+}
+
+//set default OSCclient 
+var OSCclient = new osc.Client(11720, '127.0.0.1');
+
 io.on('connection', function(client){
   client.send({ buffer: buffer });
   client.broadcast({ announcement: client.sessionId + ' connected' });
-
-var OSCclient = new osc.Client(11720, '127.0.0.1');
   
   client.on('message', function(message){
-	//console.log("message from client");
+	
+	var msgAr = message.split(' ');
+	if (msgAr[0] == "oscconfig"){
+
+		console.log("oscconfig message: "+msgAr[0], msgAr[1], msgAr[2]);
+		OSCclient = setOscConfig(msgAr[1], msgAr[2]);
+
+	}else{
+	
+	//console.log("OSCclient: "+ OSCclient)	
 	var msg = { message: [client.sessionId, message] };
 	buffer.push(msg);
 	if (buffer.length > 30) buffer.shift();
     client.broadcast(msg);
 	
-	
 	var OSCargs = message.split(' ');
 	OSCmsg = new osc.Message('/button');
-	for (i=0; i<OSCargs.length; i++) {
-       OSCmsg.append(parseInt(OSCargs[i]));
-    } 
-    OSCclient.send(OSCmsg);
+		for (i=0; i<OSCargs.length; i++) {
+	       OSCmsg.append(parseInt(OSCargs[i]));
+	    } 
+   	OSCclient.send(OSCmsg);
     console.log(msg);
 	console.log('OSC message: ' + OSCmsg.address + ' ' + OSCargs);
+	
+	}
 
     /*
 	var msg = { message: [client.sessionId, message] };
