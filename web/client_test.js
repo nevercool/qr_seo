@@ -1,19 +1,26 @@
+// init the reconnect timer id
+var reconnectId = "";
 
-//set number of buttons
+//set default number of buttons
 var numButtons = 16;	
 //create an array for buttons
 var buttons = new Array();
 // init a variable for button creation	
-buttonsCreated = false;
+var buttonsCreated = false;
+var oscAddress;
 
 function createButtons(){
-	//init all array values to 0 (off)
+	
+	// hide the loader gif
+	document.getElementById('buttonDiv').style.backgroundImage = "none";
+	
+	// init all array values to 0 (off)
 	for (i=0; i< numButtons; i++ ){
 		buttons[i] = 0;
 	}
 	
+	// create buttons
    for(var i = 0; i < numButtons; i++) {
-
 	var bDiv = document.createElement('div');
 	bDiv.className ='button';
 	bDiv.id ='b_'+ i;
@@ -23,8 +30,7 @@ function createButtons(){
 	lDiv.innerHTML = i;
 	bDiv.appendChild(lDiv);
 	
-		//Assign event handlers, basic js version
-		//var button = document.getElementById('b_'+ i);
+		//Assign event handlers by event support -- basic js version
 		if ('ontouchstart' in document.documentElement) {
 			bDiv.ontouchstart = function(){buttonClick(this);}
 		}else{
@@ -51,11 +57,11 @@ function buttonClick(elem){
 	if (buttons[num] == 0){
 		//alert(num +" button off, turn on")
 		buttonUpdate(num, 127, elem);
-		socket.send(num + ' 127');
+		socket.send(oscAddress + ' ' + num + ' 127');
 	}else{
 		//alert(num+" button off, turn on")
 		buttonUpdate(num, 0, elem);
-		socket.send(num + ' 0');		
+		socket.send(oscAddress + ' ' + num + ' 0');		
 	}
 
 }
@@ -88,9 +94,12 @@ function message(obj){
 	// right now this just tests for messages that have integer as 2nd element
 	// might need a better system of validating messages?
 	
-	if ('message' in obj && isInt(obj.message[1])){
+	if ('message' in obj){
 	var msg = obj.message[1].split(' ');
-	buttonUpdate(msg[0], msg[1]);
+		if(isInt(msg[1]) && isInt(msg[2])){
+			console.log("send: "+msg[1], msg[2]);
+			buttonUpdate(msg[1], msg[2]);
+		}
 	}
 	
 	if( obj.message && window.console && console.log ) console.log(obj.message[0], obj.message[1]);
@@ -110,15 +119,6 @@ function esc(msg){
 	return msg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-/*
-function send(){
-var val = document.getElementById('text').value;
-socket.send(val);
-message({ message: ['you', val] });
-document.getElementById('text').value = '';
-}
-
-*/
 
 var maxBufferDisplay = 15;
 var socket = new io.Socket(null, {port: socketPort, rememberTransport: false});
@@ -127,12 +127,14 @@ var socket = new io.Socket(null, {port: socketPort, rememberTransport: false});
 ///// INIT FUNCTION ///////
 
 function initClient(){
-
-numButtons = document.getElementById('buttons').value;		
+	
+	if (document.getElementById('buttons')) numButtons = document.getElementById('buttons').value;	
 	socket.connect();
 
 	socket.on('message', function(obj){
-		if ('buffer' in obj){
+		
+		if ('buffer' in obj && !resetBuffer){
+			console.log(resetBuffer);
 		// buffer gets sent on connection
 		//document.getElementById('form').style.display='block';
 	
@@ -141,26 +143,32 @@ numButtons = document.getElementById('buttons').value;
 	
 			// only update the buttons in buffer, not messages
 			for (var i in obj.buffer){
+				console.log ("buffer: "+obj.buffer[i].message[1]);
 				var msg = obj.buffer[i].message[1].split(' ');
-				buttonUpdate(msg[0], msg[1]);
+				buttonUpdate(msg[1], msg[2]);
 			}	
-
+		resetBuffer = false;
 		} else message(obj);
 	});
 
 	socket.on('connect', function(){
-		console.log("buttonsCreated "+buttonsCreated)
+		if (reconnectId != "") clearInterval( reconnectId );
+		//only do this once
 		if (!buttonsCreated){
 			createButtons();
+			document.getElementById('status').innerHTML = '';
+			message({ message: ['System', 'Connected']})
+		
+			var oscConfig = new Array(document.getElementById('address').value, document.getElementById('ip').value, document.getElementById('port').value);
+			console.log("oscConfig: "+oscConfig[0], oscConfig[1], oscConfig[2]);
+			socket.send('oscconfig ' + oscConfig[0] +' '+ oscConfig[1]+' '+oscConfig[2]);
+			if (oscConfig[0].charAt(0) == "/") oscAddress = oscConfig[0];
+			
+			if (resetBuffer){
+			socket.send('resetBuffer');	
+			}
 		}
-		document.getElementById('status').innerHTML = '';
-		 message({ message: ['System', 'Connected']})
-		
-		var oscConfig = new Array(document.getElementById('ip').value, document.getElementById('port').value);
-		console.log("oscConfig: "+oscConfig[0], oscConfig[1]);
-		socket.send('oscconfig ' + oscConfig[0] +' '+ oscConfig[1]);
-		
-		});
+	});
 
 	socket.on('disconnect', function(){
 	
@@ -174,7 +182,7 @@ numButtons = document.getElementById('buttons').value;
 	
 		//message({ message: ['System', 'Disconnected']});
 		//alert ("Disconnected. Press OK to reconnect.");
-		setTimeout("socket.connect()", 2000);
+		reconnectId  = setInterval("reconnectSocket()", 2000);
 	});
 
 	socket.on('reconnect', function(){ message({ message: ['System', 'Reconnected to server']})});
@@ -182,6 +190,7 @@ numButtons = document.getElementById('buttons').value;
 	socket.on('reconnect_failed', function(){ message({ message: ['System', 'Reconnected to server FAILED.']})});
 
 }
-
-
-
+function reconnectSocket(){
+	socket.connect();
+	console.log("socket reconnecting...");
+}
